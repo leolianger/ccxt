@@ -15,7 +15,8 @@ from ccxt.base.errors import DDoSProtection
 from ccxt.base.decimal_to_precision import TRUNCATE
 from ccxt.base.decimal_to_precision import DECIMAL_PLACES
 from ccxt.base.decimal_to_precision import NO_PADDING
-
+import requests
+import json
 
 class bytetrade(Exchange):
 
@@ -564,6 +565,7 @@ class bytetrade(Exchange):
         expirationDatetime = expirationDatetime.split('.')[0]
         defaultDappId = 'Sagittarius'
         dappId = self.safe_string(params, 'dappId', defaultDappId)
+        signServer = self.safe_string(params, 'sign_server', '')
         defaultFee = self.safe_string(self.options, 'fee', '300000000000000')
         fee = self.safe_string(params, 'fee', defaultFee)
         eightBytes = self.integer_pow('2', '64')
@@ -641,7 +643,17 @@ class bytetrade(Exchange):
         orderid = orderidhash[0:40]
         bytestring = self.binary_concat_array(allByteStringArray)
         hash = self.hash(bytestring, 'sha256', 'hex')
-        signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
+        if(signServer != ''):
+            sign_request = {
+                'id': self.apiKey,
+                'input': hash,
+                'sign_flag': 0,
+            }
+            headers = {"Content-Type": "application/json"}
+            sign_response = requests.post(signServer, json=sign_request, headers=headers)
+            signature = json.loads(sign_response)['result']['sign_info'].replace('"', '')
+        else:
+            signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
         recoveryParam = self.decode(base64.b16encode(self.number_to_le(self.sum(signature['v'], 31), 1)))
         mySignature = recoveryParam + signature['r'] + signature['s']
         operation = {
@@ -783,6 +795,7 @@ class bytetrade(Exchange):
         expirationDatetime = expirationDatetime.split('.')[0]
         defaultDappId = 'Sagittarius'
         dappId = self.safe_string(params, 'dappId', defaultDappId)
+        signServer = self.safe_string(params, 'sign_server', '')
         byteStringArray = [
             self.number_to_be(1, 32),
             self.number_to_le(int(math.floor(now / 1000)), 4),
@@ -807,7 +820,17 @@ class bytetrade(Exchange):
         ]
         bytestring = self.binary_concat_array(byteStringArray)
         hash = self.hash(bytestring, 'sha256', 'hex')
-        signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
+        if(signServer != ''):
+            sign_request = {
+                'id': self.apiKey,
+                'input': hash,
+                'sign_flag': 0,
+            }
+            headers = {"Content-Type": "application/json"}
+            sign_response = requests.post(signServer, json=sign_request, headers=headers)
+            signature = json.loads(sign_response)['result']['sign_info'].replace('"', '')
+        else:
+            signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
         recoveryParam = self.decode(base64.b16encode(self.number_to_le(self.sum(signature['v'], 31), 1)))
         mySignature = recoveryParam + signature['r'] + signature['s']
         operation = {
@@ -879,6 +902,7 @@ class bytetrade(Exchange):
         feeAmount = '300000000000000'
         defaultDappId = 'Sagittarius'
         dappId = self.safe_string(params, 'dappId', defaultDappId)
+        signServer = self.safe_string(params, 'sign_server', '')
         eightBytes = self.integer_pow('2', '64')
         byteStringArray = [
             self.number_to_be(1, 32),
@@ -907,7 +931,17 @@ class bytetrade(Exchange):
         ]
         bytestring = self.binary_concat_array(byteStringArray)
         hash = self.hash(bytestring, 'sha256', 'hex')
-        signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
+        if(signServer != ''):
+            sign_request = {
+                'id': self.apiKey,
+                'input': hash,
+                'sign_flag': 0,
+            }
+            headers = {"Content-Type": "application/json"}
+            sign_response = requests.post(signServer, json=sign_request, headers=headers)
+            signature = json.loads(sign_response)['result']['sign_info'].replace('"', '')
+        else:
+            signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
         recoveryParam = self.decode(base64.b16encode(self.number_to_le(self.sum(signature['v'], 31), 1)))
         mySignature = recoveryParam + signature['r'] + signature['s']
         operation = {
@@ -1120,6 +1154,7 @@ class bytetrade(Exchange):
         expirationDatetime = expirationDatetime.split('.')[0]
         defaultDappId = 'Sagittarius'
         dappId = self.safe_string(params, 'dappId', defaultDappId)
+        signServer = self.safe_string(params, 'sign_server', '')
         feeAmount = '300000000000000'
         currency = self.currency(code)
         coinId = currency['id']
@@ -1187,7 +1222,17 @@ class bytetrade(Exchange):
             ]
         bytestring = self.binary_concat_array(byteStringArray)
         hash = self.hash(bytestring, 'sha256', 'hex')
-        signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
+        if(signServer != ''):
+            sign_request = {
+                'id': self.apiKey,
+                'input': hash,
+                'sign_flag': 0,
+            }
+            headers = {"Content-Type": "application/json"}
+            sign_response = requests.post(signServer, json=sign_request, headers=headers)
+            signature = json.loads(sign_response)['result']['sign_info'].replace('"', '')
+        else:
+            signature = self.ecdsa(hash, self.secret, 'secp256k1', None, True)
         recoveryParam = self.decode(base64.b16encode(self.number_to_le(self.sum(signature['v'], 31), 1)))
         mySignature = recoveryParam + signature['r'] + signature['s']
         fatty = None
